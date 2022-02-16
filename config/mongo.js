@@ -1,6 +1,3 @@
-// Spins up a MongoDB server programmatically from within nodejs, 
-// for testing or mocking during development. By default it holds the data in memory.
-
 import { MongoMemoryServer } from "mongodb-memory-server";
 import { MongoClient } from "mongodb";
 import { getDBAddress } from './aws.js'
@@ -16,6 +13,8 @@ async function startDatabase() {
       console.log("Connecting to production database...");
   }
   else {
+      // Spins up a MongoDB server programmatically from within nodejs, 
+      // for testing or mocking during development. By default it holds the data in memory.
       const mongo = new MongoMemoryServer();
       await mongo.start();
       mongoDBURL = await mongo.getUri();

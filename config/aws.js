@@ -44,30 +44,6 @@ var client = new AWS.SecretsManager({
     region: region
 });
 
-/*
-async function getSecret() {
-    await client.getSecretValue({SecretId: secretName}, function(err, data) {
-        if (err) {
-            throw err;
-        }
-        else {
-            secret = data.SecretString;
-    
-            var pubKey = JSON.parse(secret).id_rsa_pub;
-            var privKey = JSON.parse(secret).id_rsa_priv;
-        }
-    });
-
-    return pubKey, privKey;
-}
-
-const {pubKey, privKey} = getSecret();
-*/
-
-async function getSecret() {
-
-}
-
 let data = await client.getSecretValue({SecretId: secretName}).promise();
 let secret = data.SecretString;
 let parsedSecret = JSON.parse(secret);
@@ -75,14 +51,17 @@ let privKey = parsedSecret.id_rsa_priv;
 let pubKey = parsedSecret.id_rsa_pub;
 let dbAddress = parsedSecret.db_address
 
+// Returns the RSA priv key that is stored in AWS Secrets Manager
 function getPrivKey() {
     return privKey;
 }
 
+// Returns the RSA pub key that is stored in AWS Secrets Manager
 function getPubKey() {
     return pubKey;
 }
 
+// Returns the address for the mongodb production server
 function getDBAddress() {
     return dbAddress;
 }

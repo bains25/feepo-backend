@@ -1,10 +1,10 @@
 import validator from "validator";
 import mongoose from "mongoose";
 import { getDatabase } from "./mongo.js";
-const TEST_PIC_URL = "http://static.demilked.com/wp-content/uploads/2019/08/5d526c73b1566-russian-artist-photoshops-giant-cats-odnoboko-coverimage.jpg";
 import * as utils from "../utils.js";
 import { config } from "dotenv";
 config();
+const TEST_PIC_URL = "http://static.demilked.com/wp-content/uploads/2019/08/5d526c73b1566-russian-artist-photoshops-giant-cats-odnoboko-coverimage.jpg";
 
 async function setupMongoose() {
     let connectionAddress = null;
@@ -18,8 +18,8 @@ async function setupMongoose() {
         console.log('Database connected');
     });
 
+    // Add test data
     if(process.env.NODE_ENV === 'development') {
-        // Add test data
         var TEST_IMAGES = [
             {"imageURL": TEST_PIC_URL},
             {"imageURL": TEST_PIC_URL},
@@ -39,8 +39,15 @@ async function setupMongoose() {
         }
     }
 }
-
 setupMongoose();
+
+/**
+ * 
+ * 
+ * Schemas
+ * 
+ * 
+ */
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -66,19 +73,15 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', UserSchema);
 
+/**
+ * 
+ *
+ * Functions to access database
+ * 
+ * 
+ */
 
-
-
-
-
-
-
-
-
-
-
-
-// Used for passport strategy
+// Used for validation in the passport strategy
 async function lookupUser(userID) {
     var result;
     await User.findOne({_id: userID})
@@ -105,8 +108,6 @@ async function findUserByUsername(username) {
     return User.findOne({ username: username}).exec();
 }
 
-// Returns users who are artists
-// TODO: Filter users based on whether they are artists
 async function getArtists() {
     var artists;
     await User.find({}, "-hash -salt -images").then((result) => {
@@ -125,7 +126,7 @@ async function getArtist(username) {
     return user;
 }
 
-// Returns list of urls for images uploaded by the artist
+// Returns a list of urls for images uploaded by the artist
 async function getArtistImages(username) {
     var images;
     await User.findOne({username: username}, "username images").then((result) => {
@@ -157,7 +158,7 @@ async function addUser(username, email, profilePicURL, hash, salt) {
 
 async function setArtistImages(userID, images) {
     var result;
-    //console.log("imageUrls\n", images);
+    
     // map each image url to a json object with a key "imageURL" and a value equal to the respective url string
     try {
       await User.findOneAndUpdate({"_id": userID}, {$push: { "images": { "$each": images } }}, {upsert: false, new: true})
